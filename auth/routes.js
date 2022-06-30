@@ -59,7 +59,7 @@ function authRoutesMiddleware() {
     const tokenSet = req.session.tokenSet;
 
     try {
-      await client.revoke(tokenSet.accessToken);
+      await client.revoke(tokenSet.access_token);
     } catch(e) {
       console.error('error revoking access_token', e);
     }
