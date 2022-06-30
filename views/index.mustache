@@ -1,5 +1,54 @@
 <html>
   <body>
     <div><a href="/auth/login">LOGIN!</a></div>
+    <pre>
+    Pressing "LOGIN", it redirects to /auth/login,
+    which redirects to https://accounts.google.com/o/oauth2/v2/auth?...
+
+    ============                 ================               ==============
+     Browser                      NodeJS+Express                 Google
+    ============                 ================               ==============
+      
+      GET /auth/login  
+      -------------------------------->
+    
+       302 Redirect 
+       https://accounts.google.com/o/oauth2/v2/auth?
+       client_id=x&scope=x&redirect_uri=x...
+      <----------------------------------
+       GET https://accounts.google.com/o/oauth2/v2/auth?clent_id=x&...
+      ------------------------------------------------------------------>
+    
+       200 ok login.html
+      <------------------------------------------------------------------
+      
+       POST login
+      ------------------------------------------------------------------->
+       302 Redirect /auth/callback?code=x&state=x
+      <-------------------------------------------------------------------
+    
+    
+       GET /auth/callback?code=x&state=x 
+      --------------------------------->
+      
+                                         POST https://oauth2.google.com/token
+                                         code / client_id / client_secret /
+                                         redirect_uri / grant_type / scope
+                                        --------------------------------->
+                                         200 ok
+                                         access_token / id_token
+                                        <----------------------------------
+    
+       202 ok
+       Set-cookie: session=x
+      <---------------------------------
+    
+       GET /private
+       cookie: session=x
+      --------------------------------->
+       200 ok
+       cookie: session=x
+      <---------------------------------
+    </pre>
   </body>
 </html>

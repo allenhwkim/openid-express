@@ -1,12 +1,13 @@
 const { TokenSet } = require('openid-client');
-const { fromBase64, toBase64 } = require('./encoding');
 
-function serialize(session) {
-  return toBase64(session);
+function serialize(data) {
+  return JSON.stringify(data);
+  // return Buffer.from(JSON.stringify(data)).toString('base64');
 }
 
 function deserialize(value) {
-  const raw = fromBase64(value);
+  // const raw = JSON.parse(Buffer.from(value, 'base64').toString('utf8'));
+  const raw = JSON.parse(value);
   return {...raw, tokenSet: new TokenSet(raw.tokenSet)}
 }
 

@@ -10,9 +10,9 @@ console.log(`
   GOOGLE_CLIENT_SECRET: ${process.env.GOOGLE_CLIENT_SECRET}
 `)
 
-const auth = require('./auth');
-const { application } = require('express');
 const app = express();
+const { initialize, session } = require('./auth/middleware');
+const authRoutes = require('./auth/routes');
 
 // View engine
 app.engine('mustache', mustacheExpress());
@@ -21,15 +21,19 @@ app.set('views', __dirname + '/views');
 
 // Middlewares
 app.use(cookieParser());
-app.use(auth.initialize); // initialise the Issuer and the Client
-app.use(auth.session); // Deals with the user session 
-app.use(auth.routes()); // Addds OAuth/OpenId routes
+app.use(initialize); // initialise the Issuer and the Client
+app.use(session); // Deals with the user session 
+app.use(authRoutes); // Addds OAuth/OpenId routes
 
 app.get('/', (req, res) => {
   res.render('index');
 })
 
-app.get('/private', auth.requireAuth, (req, res) => {
+app.get('/private', (req, res) => {
+  if (!req.session) {
+    return next(new Error('unauthorized'));
+  }
+
   const claims = req.session.tokenSet.claims();
 
   res.render('private', {

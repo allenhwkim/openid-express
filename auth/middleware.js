@@ -1,13 +1,8 @@
 const { Issuer } = require('openid-client');
 const { deserialize, serialize } = require('./session');
 
-function getDomain() {
-  return `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
-}
-
 async function initialize(req, res, next) {
   if (req.app.authIssuer) return next();
-  
   
   const googleIssuer = await Issuer.discover('https://accounts.google.com');
   console.log('OpenId issuer created:', googleIssuer.issuer);
@@ -15,16 +10,9 @@ async function initialize(req, res, next) {
   const client = new googleIssuer.Client({
     client_id: process.env.GOOGLE_CLIENT_ID,
     client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uris: [`${getDomain()}/auth/callback`],
+    redirect_uris: [`http://localhost:3000/auth/callback`],
     response_types: ['code']
   });
-
-  console.log({
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uris: [`${getDomain()}/auth/callback`],
-    response_types: ['code']
-  })
 
   req.app.authIssuer = googleIssuer;
   req.app.authClient = client;
@@ -71,17 +59,7 @@ async function session(req, res, next) {
   next();
 }
 
-async function requireAuth(req, res, next) {
-  const session = req.session;
-  if (!session) {
-    return next(new Error('unauthorized'));
-  }
-  next();
-}
-
 module.exports = {
-  getDomain,
   initialize,
-  session,
-  requireAuth
+  session
 }
