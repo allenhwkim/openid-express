@@ -1,5 +1,4 @@
 const { Router } = require('express');
-const { setSessionCookie, clearSessionCookie } = require('./cookie');
 const { serialize } = require('./session');
 const { getDomain } = require('./middleware');
 const {
@@ -45,7 +44,10 @@ function authRoutesMiddleware() {
       const user = await client.userinfo(tokenSet);
 
       const sessionCookie = serialize({ tokenSet, user });
-      setSessionCookie(res, sessionCookie);
+      res.cookie('auth', sessionCookie, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 9000000),
+      })
 
       res.redirect(backToPath);
     } catch(e) {
@@ -63,20 +65,10 @@ function authRoutesMiddleware() {
     } catch(e) {
       console.error('error revoking access_token', e);
     }
-    clearSessionCookie(res);
+    res.clearCookie('auth');
 
     res.redirect('/');
   });
-
-  router.get('/auth/logout/sso', async (req, res, next) => {
-    const client = req.app.authClient;
-    const tokenSet = req.session.tokenSet;
-
-    clearSessionCookie(res);
-
-    const endSessionUrl = client.endSessionUrl();
-    res.redirect(endSessionUrl);
-  })
 
   return router;
 }

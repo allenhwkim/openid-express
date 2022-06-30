@@ -1,9 +1,4 @@
 const { Issuer } = require('openid-client');
-const { 
-  clearSessionCookie,
-  getSessionCookie,
-  setSessionCookie
-} = require('./cookie');
 const { deserialize, serialize } = require('./session');
 
 function getDomain() {
@@ -38,7 +33,7 @@ async function initialize(req, res, next) {
 }
 
 async function session(req, res, next) {
-  const sessionCookie = getSessionCookie(req);
+  const sessionCookie = req.cookies['auth'];;
   if (!sessionCookie) return next();  // no session cookie, do nothing
 
   // get cookie and parse it
@@ -50,9 +45,12 @@ async function session(req, res, next) {
     try {
       const refreshedTokenSet = await client.refersh(session.tokenSet);
       session.tokenSet = refreshedTokenSet;
-      setSessionCookie(res, serialize(session));
+      res.cookie('auth', serialize(session), {
+        httpOnly: true,
+        expires: new Date(Date.now() + 9000000),
+      })
     } catch(err) { // logout completely
-      clearSessionCookie(res);
+      res.clearCookie('auth')
       return next();
     }
   }
