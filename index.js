@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   res.render('index');
 })
 
-app.get('/private', (req, res) => {
+app.get('/private', (req, res, next) => {
   if (!req.session) {
     return next(new Error('unauthorized'));
   }

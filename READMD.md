@@ -78,33 +78,39 @@ authorization_endpoint:
       
       GET /auth/login  
       -------------------------------->
-    
-       302 Redirect 
-       https://accounts.google.com/o/oauth2/v2/auth?
+       302 https://accounts.google.com/o/oauth2/v2/auth?
        client_id=x&scope=x&redirect_uri=x...
       <----------------------------------
-       GET https://accounts.google.com/o/oauth2/v2/auth?clent_id=x&...
-      ------------------------------------------------------------------>
-       200 ok login.html
+      --GET------------------------------------------------------------->
+       200 login.html
       <------------------------------------------------------------------
       
-       POST login
+
+       username/password. Then POST login
       ------------------------------------------------------------------->
        302 Redirect /auth/callback?code=x&scope=x&prompt=x&authuser=x
-      --------------------------------->
+      <------------------------------------------------------------------
+      --GET---------------------------->
       
+
                                          POST https://oauth2.google.com/token
                                          code + client_id + client_secret 
                                         --------------------------------->
-                                         200 ok access_token / JWT(id_token)
+                                         200 ok access_token / id_token(a JWT)
                                         <----------------------------------
     
-       302 /private
-       Set-cookie: session=x
-      <---------------------------------
-      --------------------------------->
 
-       200 ok
-       cookie: session=x
+                                         GET https://oauth2.google.com/userinfo
+                                         access_token
+                                        --------------------------------->
+                                         200 {user}
+                                        <----------------------------------
+
+
+       302 /private
+       Set-cookie: auth={user, tokenSet}
+      <---------------------------------
+      --GET---------------------------->
+        200 cookie: auth={user, tokenSet}
       <---------------------------------
 ```

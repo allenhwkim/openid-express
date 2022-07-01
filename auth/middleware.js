@@ -1,4 +1,4 @@
-const { Issuer } = require('openid-client');
+const { Issuer, custom } = require('openid-client');
 const { deserialize, serialize } = require('./session');
 
 async function initialize(req, res, next) {
@@ -28,6 +28,10 @@ async function session(req, res, next) {
 
   // get cookie and parse it
   const client = req.app.authClient;
+  client[custom.http_options] = (url, options) => {
+    console.log('>>>>>>> Request to Google >>>>>>>', url.href, {options});
+    return { timeout: 0 };
+  }
   const session = deserialize(sessionCookie);
 
   // refresh token if needed
