@@ -14,7 +14,7 @@ router.get('/auth/login', (req, res) => {
 })
 
 router.get('/auth/callback', async (req, res, next) => {
-  console.log('/auth/callback');
+  console.log('/auth/callback', req.url);
   try {
     const client = req.app.authClient;
     client[custom.http_options] = (url, options) => {
@@ -23,11 +23,12 @@ router.get('/auth/callback', async (req, res, next) => {
     }
 
     const params = client.callbackParams(req);
-    const tokenSet = await client.callback(
+    const tokenSet = await client.callback( // POST call to token endpoint
       `http://localhost:3000/auth/callback`, params, {}
     );
+
     // Fetches the OIDC userinfo response with the provided Access Token.
-    const user = await client.userinfo(tokenSet);
+    const user = await client.userinfo(tokenSet); // GET call to userinfo endpoint
 
     const sessionCookie = serialize({ tokenSet, user });
     res.cookie('auth', sessionCookie, {

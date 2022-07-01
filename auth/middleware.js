@@ -4,7 +4,9 @@ const { deserialize, serialize } = require('./session');
 async function initialize(req, res, next) {
   if (req.app.authIssuer) return next();
   
+  // Discover Google's OpenID Connect provider
   const googleIssuer = await Issuer.discover('https://accounts.google.com');
+
   console.log('OpenId issuer created:', googleIssuer.issuer);
 
   const client = new googleIssuer.Client({
