@@ -1,6 +1,0 @@
-<html>
-  <body>
-    <div>ERROR</div>
-    <div>{{error}}</div>
-  </body>
-</html>

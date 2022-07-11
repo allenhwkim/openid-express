@@ -7,7 +7,6 @@ const AuthCookie = {
   get(req) {
     const cookieValue = req.cookies.auth;
     if (cookieValue) {
-      // const raw = JSON.parse(Buffer.from(value, 'base64').toString('utf8'));
       const auth = JSON.parse(cookieValue);
       auth.tokenSet = new TokenSet(auth.tokenSet);
       return auth;

@@ -12,7 +12,7 @@ const app = express();
 const session = require('./auth/session');
 const authRoutes = require('./auth/routes');
 
-// View engine
+// Express view engine, responds to `res.render(path)`
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
@@ -20,7 +20,7 @@ app.set('views', __dirname + '/views');
 // Middlewares
 app.use(cookieParser());
 app.use(session); // initialise oauth2 issuer/client, and deals with the user session 
-app.use(authRoutes); // Adds OAuth/OpenId routes
+app.use(authRoutes); // oauth2 routes /auth/login, /auth/callback, and /auth/logout
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -31,13 +31,8 @@ app.get('/private', (req, res, next) => {
     return next(new Error('unauthorized'));
   }
 
-  const claims = req.session.tokenSet.claims();
-
-  res.render('private', {
-    email: claims.email,
-    picture: claims.picture,
-    name: claims.name
-  })
+  const {email, picture, name} = req.session.tokenSet.claims();
+  res.render('private', { email, picture, name });
 })
 
 app.listen(3000, () => console.log('Listening on port 3000'));
