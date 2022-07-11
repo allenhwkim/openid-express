@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const { serialize } = require('./session');
 const { custom } = require('openid-client');
+const AuthCookie = require('./auth-cookie');
 
 const router = Router();
 
@@ -29,13 +29,7 @@ router.get('/auth/callback', async (req, res, next) => {
 
     // Fetches the OIDC userinfo response with the provided Access Token.
     const user = await client.userinfo(tokenSet); // GET call to userinfo endpoint
-
-    const sessionCookie = serialize({ tokenSet, user });
-    res.cookie('auth', sessionCookie, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 9000000),
-    })
-
+    AuthCookie.set(res, {tokenSet, user});
     res.redirect('/private');
   } catch(e) {
     console.log('Something went wrong', e);

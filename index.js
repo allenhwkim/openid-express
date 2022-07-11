@@ -4,14 +4,13 @@ const mustacheExpress = require('mustache-express');
 const cookieParser = require('cookie-parser');
 
 console.log(`
-  USING
   HOST: ${process.env.HOST}:${process.env.PORT},
   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID},
   GOOGLE_CLIENT_SECRET: ${process.env.GOOGLE_CLIENT_SECRET}
 `)
 
 const app = express();
-const { initialize, session } = require('./auth/middleware');
+const session = require('./auth/session');
 const authRoutes = require('./auth/routes');
 
 // View engine
@@ -21,9 +20,8 @@ app.set('views', __dirname + '/views');
 
 // Middlewares
 app.use(cookieParser());
-app.use(initialize); // initialise the Issuer and the Client
-app.use(session); // Deals with the user session 
-app.use(authRoutes); // Addds OAuth/OpenId routes
+app.use(session); // initialise oauth2 issuer/client, and deals with the user session 
+app.use(authRoutes); // Adds OAuth/OpenId routes
 
 app.get('/', (req, res) => {
   res.render('index');
