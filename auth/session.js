@@ -10,9 +10,8 @@ const AuthCookie = require('./auth-cookie');
  */
 async function session(req, res, next) {
   if (!req.app.authIssuer) { // initialize auth issuer and oauth2 client
-    // Discover Google's OpenID Connect provider
     const googleIssuer = await Issuer.discover('https://accounts.google.com');
-    console.log('OpenId issuer created:', googleIssuer.issuer);
+    console.log('>>> OpenId issuer created:', googleIssuer.issuer);
 
     const client = new googleIssuer.Client({
       client_id: process.env.GOOGLE_CLIENT_ID,
@@ -49,16 +48,13 @@ async function session(req, res, next) {
   // validate the token
   const validate = req.app.authClient?.validateIdToken;
   try {
-    console.log('validating token', session.tokenSet);
-    await validate.call(req.app.authClient, session.tokenSet);
+    const resp = await validate.call(req.app.authClient, session.tokenSet);
+    console.log('>>>> validating token', resp);
   } catch(err) {
-    console.error(err);
-    console.log('bad token signature found in auth cookie');
     return next(new Error("Bad Token in Auth Cookie!"));
   }
 
   req.session = session;
-
   next();
 }
 
