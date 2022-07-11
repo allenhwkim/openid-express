@@ -1,8 +1,8 @@
 const express = require('express');
-require('dotenv').config();
 const mustacheExpress = require('mustache-express');
 const cookieParser = require('cookie-parser');
 
+require('dotenv').config(); // read process.env from `.env` file
 console.log(`
   HOST: ${process.env.HOST}:${process.env.PORT},
   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID},
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/private', (req, res, next) => {
-  if (!req.session) {
+  if (!req.session) { // set by session middleware when 'auth' cookie is not expired and valid
     return next(new Error('unauthorized'));
   }
 
