@@ -5,19 +5,15 @@ const { TokenSet } = require("openid-client");
 // encode : Buffer.from(JSON.stringify(data)).toString('base64');
 const AuthCookie = {
   get(req) {
-    const cookieValue = req.cookies.auth;
-    if (cookieValue) {
-      const auth = JSON.parse(cookieValue);
+    if (req.cookies.auth) {
+      const auth = JSON.parse(req.cookies.auth);
       auth.tokenSet = new TokenSet(auth.tokenSet);
       return auth;
-    } else {
-      return null
-    }
+    } 
   },
 
   set(res, value) {
-    const cookieValue = JSON.stringify(value);
-    res.cookie('auth', cookieValue, {
+    res.cookie('auth', JSON.stringify(value), {
       httpOnly: true,
       expires: new Date(Date.now() + 9000000),
     })
